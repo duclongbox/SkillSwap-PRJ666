@@ -23,8 +23,8 @@ const PORT = process.env.PORT || 8000;
 // };
 
 app.use(cors({
-  origin: process.env.CLIENT_URL, // Adjust this to your frontend URL
-  credentials: true, // Allow cookies to be sent
+  origin: process.env.CLIENT_URL, 
+  credentials: true,// Allow cookies to be sent
 }));
 
 app.use(express.json());

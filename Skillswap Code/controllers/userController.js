@@ -17,4 +17,5 @@ const getCurrentUserFunction = (req, res) => {
     });
 };
 
+
 module.exports = { getUserById , getCurrentUserFunction};

@@ -11,7 +11,13 @@ const {
     checkSessionStatus
 } = require('../../controllers/authController');
 const { getCurrentUserFunction } = require('../../controllers/userController');
-
+const {
+    sendConnection,
+    acceptRequest,
+    declineRequest,
+    listConnections,
+    listRequest
+} = require('../../controllers/connectionController')
 
 // Render routes
 router.get('/', renderHomePage);
@@ -25,7 +31,18 @@ router.get('/api/me', isAuthenticated, getCurrentUserFunction);
 router.get('/api/session-status', checkSessionStatus);
 
 
-// Protected API routes example
+// User Connection Routes
+router.post('/:recipientID/sendRequest',isAuthenticated,sendConnection );
+router.post('/:connectionID/accept',isAuthenticated, acceptRequest);
+router.post('/:connectionID/decline',isAuthenticated, declineRequest);
+router.get('/requests',isAuthenticated, listRequest);
+router.get('/connections',isAuthenticated, listConnections);
+
+
+
+
+
+// Protected API routes testing
 router.get('/api/protectedData', isAuthenticated, (req, res) => {
     res.json({ 
         message: 'This is protected data',
