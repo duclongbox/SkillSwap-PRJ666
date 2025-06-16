@@ -13,15 +13,6 @@ dotenv.config();
 const PORT = process.env.PORT || 8000;
 
 
-// const config = {
-//   authRequired: false,
-//   auth0Logout: true,
-//   secret: process.env.AUTH_SECRET,
-//   baseURL: 'http://localhost:8000',
-//   clientID: process.env.CLIENT_ID,
-//   issuerBaseURL: process.env.ISSUER_BASE_URL
-// };
-
 app.use(cors({
   origin: process.env.CLIENT_URL, 
   credentials: true,// Allow cookies to be sent

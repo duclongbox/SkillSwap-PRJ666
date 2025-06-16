@@ -5,24 +5,15 @@ const sendConnection = async (req,res) => {
     const senderID = req.user._id;
     const recipientID = req.params.recipientID;
 
-    if (senderID === recipientID){
-        return res.status(400).json({message:"Cannot connect to your self"});
+    if (senderID.toString() === recipientID){
+        return res.status(400).json({message:"Cannot connect to yourself"});
     } 
-    try{
-        const sender = User.findById(senderID); // update the latest user
-    }catch(error){
-        return res.status(500).json({
-            message:"error finding/updating current user"
-        })
-    }
-    try{
-        const recipient = User.findById(recipientID); 
-        if (!recipient) return res.status(404).json({message:"user not found"});
-    }catch(error){
-        return res.status(500).json({
-            message:"error finding/updating recipient"
-        })
-    }
+    
+    const sender = await User.findById(senderID); // update the latest user
+    
+    const recipient = await User.findById(recipientID); 
+    if (!recipient) return res.status(404).json({message:"user not found"});
+ 
     
     // check if the connection already exist
     const existedConenction = await Connection.findOne({
@@ -90,7 +81,7 @@ const declineRequest = async (req, res) =>{
 const listRequest = async (req, res) =>{
     const userID = req.user._id;
     try{
-        const listRequests = await Connection.find({recipient: userID, status:'pending'}).populate('sender')
+        const listRequests = await Connection.find({recipient: userID, status:'pending'}).populate('sender').lean();
         res.json({
             listRequests
         })
@@ -102,13 +93,14 @@ const listRequest = async (req, res) =>{
 // list all current user connection
 const  listConnections = async (req, res) =>{
     const userID = req.user._id;
-    const connections = Connection.find(
+    const connections = await Connection.find(
         {
             $and:[
                 { status: 'accepted' },
                 { $or: [{ sender: userID }, { recipient: userID }] }
             ]
-        }).populate('sender recipient');
+        }).populate('sender recipient').lean();
+    // console.log(connections)
     res.json({
         connections
     })

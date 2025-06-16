@@ -10,7 +10,7 @@ const isAuthenticated = (req, res, next) => {
             code: 'UNAUTHORIZED'
         });
     }
-    return res.redirect('/login');
+    return res.json({message:"is not thenticate"});
 };
 
 // Middleware to check if user is NOT authenticated
