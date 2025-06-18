@@ -1,47 +1,54 @@
-import express from 'express';
-import  { auth } from 'express-openid-connect';
-import dotenv from 'dotenv';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-
+const express = require('express');
+const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const session = require('express-session');
+const apiRouter = require('./routes/v1/index');
+require('./config/passport')
 const app = express();
 dotenv.config();
 
 const PORT = process.env.PORT || 8000;
 
 
-const config = {
-  authRequired: false,
-  auth0Logout: true,
-  secret: process.env.AUTH_SECRET,
-  baseURL: 'http://localhost:8000',
-  clientID: process.env.CLIENT_ID,
-  issuerBaseURL: process.env.ISSUER_BASE_URL
-};
-
 app.use(cors({
-  origin: process.env.CLIENT_URL, // Adjust this to your frontend URL
-  credentials: true, // Allow cookies to be sent
+  origin: process.env.CLIENT_URL, 
+  credentials: true,// Allow cookies to be sent
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// auth router attaches /login, /logout, and /callback routes to the baseURL
-app.use(auth(config));
-app.get('/', (req, res) => {
-  res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
-});
 
+
+// Session configuration
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  },
+  name: "sessionID"
+}));
+
+// Initialize Passport and restore authentication state from session
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use("/", apiRouter);
 
 const server = async () => {
   try {
     // Connect to MongoDB
-    // await mongoose.connect(process.env.MONGODB_URI, {
-    //   useNewUrlParser: true,
-    //   useUnifiedTopology: true,
-    // });
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log('Connected to MongoDB');
 
     // Start the server
