@@ -33,7 +33,7 @@
         
         .nav-links {
             display: flex;
-            gap: 25px;
+            gap: 15px;
             align-items: center;
         }
         
@@ -50,6 +50,39 @@
         .dropdown-arrow::after {
             content: " ▼";
             font-size: 10px;
+        }
+        
+        .login-btn {
+            padding: 8px 15px;
+            background-color: transparent;
+            border: 1px solid #3366cc;
+            color: #3366cc;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            background-color: #3366cc;
+            color: white;
+        }
+        
+        .signup-btn {
+            padding: 8px 15px;
+            background-color: #3366cc;
+            border: 1px solid #3366cc;
+            color: white;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .signup-btn:hover {
+            background-color: #2a56a7;
+            border-color: #2a56a7;
         }
         
         .hero {
@@ -189,6 +222,9 @@
             <a href="#" class="dropdown-arrow">Explore</a>
             <a href="#">English</a>
             <a href="#">Become a seller</a>
+            
+            <a href="login.html" class="login-btn">Log In</a>
+            <a href="signup.html" class="signup-btn">Sign Up</a>
         </div>
     </div>
     
@@ -197,14 +233,6 @@
         <div class="search-bar">
             <input type="text" placeholder="Search for any skills">
         </div>
-    </div>
-    
-    <div class="partners">
-        <span class="partner-name">Partnership with:</span>
-        <span class="partner-name">Meta</span>
-        <span class="partner-name">Google</span>
-        <span class="partner-name">Netflix</span>
-        <span class="partner-name">PayPal</span>
     </div>
     
     <div class="results-header">
