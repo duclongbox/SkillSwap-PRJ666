@@ -4,7 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-
+import ServiceDetail from './pages/ServiceDetail'; 
 
 function App() {
   return (
@@ -12,13 +12,25 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
-            <Route path="/" element={ <ProtectedRoute>
-      <Home />
-    </ProtectedRoute> } />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-              {/* add more routes to your pages here  */}
-          
+            {}
+            <Route
+              path="/service/:id"
+              element={
+                <ProtectedRoute>
+                  <ServiceDetail />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </div>
       </Router>
