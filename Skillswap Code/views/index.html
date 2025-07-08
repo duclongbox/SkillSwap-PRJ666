@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkillSwap - Search and Filter Skills</title>
+  <style>
+    /* [Unchanged styles] */
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #2c3e50;
+    }
+    .filters {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    input, select, button {
+      padding: 10px 15px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+    li {
+      background: #fdfdfd;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-left: 4px solid #3498db;
+      border-radius: 5px;
+      transition: transform 0.2s ease;
+    }
+    li:hover {
+      transform: scale(1.02);
+    }
+    .skill-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #34495e;
+    }
+    .skill-desc {
+      margin: 5px 0;
+      color: #555;
+    }
+    .skill-owner {
+      font-style: italic;
+      color: #777;
+      font-size: 14px;
+    }
+    @media (min-width: 600px) {
+      .filters {
+        flex-direction: row;
+        align-items: center;
+      }
+      .filters > * {
+        flex: 1;
+      }
+      .filters button {
+        flex: 0 0 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>SkillSwap - Explore Skills</h1>
+
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Search by skill title..." />
+      <select id="categorySelect">
+        <option value="">Filter by Category</option>
+        <option value="Web Development">Web Development</option>
+        <option value="Data Science">Data Science</option>
+        <option value="Design">Design</option>
+        <option value="Software Engineering">Software Engineering</option>
+        <option value="Systems Programming">Systems Programming</option>
+        <option value="DevOps">DevOps</option>
+        <option value="Data">Data</option>
+      </select>
+      <button onclick="clearFilters()">Clear</button>
+    </div>
+
+    <ul id="resultsList">
+      <li>Loading skills...</li>
+    </ul>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const categorySelect = document.getElementById('categorySelect');
+    const resultsList = document.getElementById('resultsList');
+
+    async function fetchSkills() {
+      const query = searchInput.value.trim();
+      const category = categorySelect.value;
+      let url = '/api/skills/search?';
+      if (query) url += `query=${encodeURIComponent(query)}&`;
+      if (category) url += `category=${encodeURIComponent(category)}&`;
+
+      resultsList.innerHTML = '<li>Loading skills...</li>';
+
+      try {
+        const res = await fetch(url);
+        const skills = await res.json();
+        displaySkills(skills);
+      } catch (err) {
+        console.error('Error fetching skills:', err);
+        resultsList.innerHTML = '<li>Error loading skills.</li>';
+      }
+    }
+
+    function displaySkills(skills) {
+      if (!skills.length) {
+        resultsList.innerHTML = '<li>No skills found.</li>';
+        return;
+      }
+
+      resultsList.innerHTML = '';
+      skills.forEach(skill => {
+        const li = document.createElement('li');
+
+        const title = document.createElement('div');
+        title.className = 'skill-title';
+        title.textContent = skill.title;
+
+        const desc = document.createElement('div');
+        desc.className = 'skill-desc';
+        desc.textContent = skill.description || 'No description.';
+
+        const owner = document.createElement('div');
+        owner.className = 'skill-owner';
+        owner.textContent = skill.owner_id ? `Owner: ${skill.owner_id.name}` : 'Owner: Unknown';
+
+        li.appendChild(title);
+        li.appendChild(desc);
+        li.appendChild(owner);
+
+        resultsList.appendChild(li);
+      });
+    }
+
+    function clearFilters() {
+      searchInput.value = '';
+      categorySelect.value = '';
+      fetchSkills();
+    }
+
+    searchInput.addEventListener('input', () => fetchSkills());
+    categorySelect.addEventListener('change', fetchSkills);
+
+    fetchSkills();
+  </script>
+</body>
+</html>
