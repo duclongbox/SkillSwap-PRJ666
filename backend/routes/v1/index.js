@@ -18,6 +18,8 @@ const {
     listConnections,
     listRequest
 } = require('../../controllers/connectionController')
+const { getAllSkills } = require('../../controllers/skillController');
+const path = require('path');
 
 // Render routes
 router.get('/', renderHomePage);
@@ -49,6 +51,14 @@ router.get('/api/protectedData', isAuthenticated, (req, res) => {
         user: req.user.email 
     });
 });
+
+
+//Skill Route
+router.get('/skills', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../views/skills.html'));
+});
+
+router.get('/api/skills', getAllSkills);
 
 
 module.exports = router;
