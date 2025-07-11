@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ServiceDetail from './pages/ServiceDetail'; 
+import CreateSkill from './pages/CreateSkill'; 
 
 function App() {
   return (
@@ -22,7 +23,17 @@ function App() {
             />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            {}
+
+            {/*route for CreateSkill */}
+            <Route
+              path="/create-skill"
+              element={
+                <ProtectedRoute>
+                  <CreateSkill />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/service/:id"
               element={

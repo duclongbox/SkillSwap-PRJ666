@@ -19,6 +19,10 @@ const {
     listRequest
 } = require('../../controllers/connectionController')
 
+const { Skill } = require('../../models/DBModels'); //for creating new skill listing
+
+
+
 // Render routes
 router.get('/', renderHomePage);
 router.get('/login', isNotAuthenticated, renderLoginPage);
@@ -40,7 +44,35 @@ router.get('/connections',isAuthenticated, listConnections);
 
 
 
-
+// Create Skill Listing
+router.post('/api/skills', isAuthenticated, async (req, res) => {
+  try {
+    const { title, category, description, exchangeSkills } = req.body;
+    const skill = new Skill({
+      title,
+      category,
+      description,
+      owner_id: req.user._id,
+      exchangeSkills
+    });
+    await skill.save();
+    res.status(201).json({ message: 'Skill created', skill });
+  } catch (err) {
+    res.status(500).json({ message: 'Error creating skill' });
+  }
+});
+// Get skill details page
+router.get('/api/skills/:id', async (req, res) => {
+  try {
+    const skill = await Skill.findById(req.params.id).populate('owner_id', 'email');
+    if (!skill) {
+      return res.status(404).json({ message: 'Skill not found' });
+    }
+    res.json(skill);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching skill' });
+  }
+});
 
 // Protected API routes testing
 router.get('/api/protectedData', isAuthenticated, (req, res) => {
