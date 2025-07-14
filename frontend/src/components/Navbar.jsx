@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 const Navbar = () => {
   const { user, logout } = useAuth();
 
-
   const handleLogout = async () => {
     await logout();
   };
@@ -32,12 +31,15 @@ const Navbar = () => {
               </Link>
             </>
           ) : (
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 text-white px-4 py-1 rounded-md font-medium hover:bg-red-700"
-            >
-              Logout
-            </button>
+            <>
+              <span className="text-sm text-gray-700 mr-2">Signed in as: {user.email}</span>
+              <button
+                onClick={handleLogout}
+                className="bg-red-600 text-white px-4 py-1 rounded-md font-medium hover:bg-red-700"
+              >
+                Logout
+              </button>
+            </>
           )}
         </div>
       </div>
