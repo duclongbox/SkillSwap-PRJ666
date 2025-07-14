@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Profile Setup - SkillSwap</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    label {
+      display: block;
+      margin: 15px 0 5px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    .button-group {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      flex: 1;
+      max-width: 140px;
+    }
+    #backBtn {
+      background-color: #95a5a6;
+      color: white;
+    }
+    #backBtn:hover {
+      background-color: #7f8c8d;
+    }
+    #submitBtn {
+      background-color: #3498db;
+      color: #fff;
+      flex: 2;
+      max-width: none;
+    }
+    #submitBtn:hover {
+      background-color: #2980b9;
+    }
+    #statusMessage {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>User Profile Setup</h2>
+    <form id="profileForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" required />
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" required />
+
+      <label for="skills">Skills (comma-separated):</label>
+      <input type="text" id="skills" placeholder="e.g. JavaScript, Node.js" />
+
+      <div class="button-group">
+        <button type="button" id="backBtn">Back</button>
+        <button type="submit" id="submitBtn">Save Profile</button>
+      </div>
+    </form>
+    <p id="statusMessage"></p>
+  </div>
+
+  <script>
+    // Get userId from URL query string, e.g. profile.html?userId=123
+    function getUserIdFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('userId');
+    }
+
+    const userId = getUserIdFromURL();
+    const form = document.getElementById('profileForm');
+    const statusMessage = document.getElementById('statusMessage');
+    const submitBtn = document.getElementById('submitBtn');
+    const backBtn = document.getElementById('backBtn');
+
+    backBtn.addEventListener('click', () => {
+      window.history.back();
+    });
+
+    async function loadProfile() {
+      if (!userId || userId.length !== 24) {
+        statusMessage.textContent = 'Invalid or missing user ID.';
+        submitBtn.disabled = true;
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/users/${userId}`);
+        if (!res.ok) throw new Error("User not found");
+
+        const user = await res.json();
+        document.getElementById('name').value = user.name || '';
+        document.getElementById('email').value = user.email || '';
+        document.getElementById('skills').value = (user.skills || []).join(', ');
+      } catch (err) {
+        console.error('Failed to load user:', err);
+        statusMessage.textContent = 'Failed to load user data.';
+        submitBtn.disabled = true;
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!userId || userId.length !== 24) {
+        statusMessage.textContent = 'Invalid or missing user ID.';
+        return;
+      }
+
+      const updatedUser = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        skills: document.getElementById('skills').value
+          .split(',')
+          .map(skill => skill.trim())
+          .filter(Boolean),
+      };
+
+      try {
+        const res = await fetch(`/api/users/${userId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedUser),
+        });
+
+        if (res.ok) {
+          statusMessage.textContent = '✅ Profile updated successfully!';
+        } else {
+          const errData = await res.json();
+          throw new Error(errData.error || 'Update failed');
+        }
+      } catch (err) {
+        console.error('Update error:', err);
+        statusMessage.textContent = '❌ Failed to update profile.';
+      }
+    });
+
+    // Load user data on page load
+    loadProfile();
+  </script>
+</body>
+</html>
