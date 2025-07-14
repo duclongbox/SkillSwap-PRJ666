@@ -9,7 +9,7 @@ npm install
 
 #### Frontend
 ```sh
-cd ../frontend
+cd frontend
 npm install
 ```
 
