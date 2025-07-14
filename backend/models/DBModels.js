@@ -17,9 +17,12 @@ const adminSchema = new mongoose.Schema({
 });
 
 const skillSchema = new mongoose.Schema({
-  title: String,
-  description: String,
-  owner_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  title: { type: String, required: true },
+  category: { type: String, required: true }, // new
+  owner_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  exchangeSkills: [String], // new
+  description: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now } 
 });
 
 const connectionSchema = new mongoose.Schema(
