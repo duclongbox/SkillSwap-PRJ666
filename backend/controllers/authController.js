@@ -94,7 +94,8 @@ const checkSessionStatus = (req, res) => {
             authenticated: true,
             user: {
                 id: req.user._id,
-                email: req.user.email
+                email: req.user.email,
+                name: req.user.name
             },
             sessionExpires: req.session.cookie.expires
         });

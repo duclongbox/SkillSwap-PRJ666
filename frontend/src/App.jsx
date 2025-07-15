@@ -4,8 +4,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import ServiceDetail from './pages/ServiceDetail'; 
-import CreateSkill from './pages/CreateSkill'; 
+import ServiceDetail from './pages/ServiceDetail';
+import CreateSkill from './pages/CreateSkill';
+import Connections from './pages/Connection';
 
 function App() {
   return (
@@ -23,7 +24,15 @@ function App() {
             />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-
+            {/* Connection Routes */}
+            <Route
+              path="/connections"
+              element={
+                <ProtectedRoute>
+                  <Connections />
+                </ProtectedRoute>
+              }
+            />
             {/*route for CreateSkill */}
             <Route
               path="/create-skill"
