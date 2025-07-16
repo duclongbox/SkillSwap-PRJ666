@@ -1,5 +1,6 @@
 // frontend/src/pages/Home.jsx
 import Navbar from '../components/Navbar';
+import SkillBox from '../components/SkillBox';
 
 const Home = () => (
   <div className="min-h-screen bg-gray-50">
@@ -25,6 +26,7 @@ const Home = () => (
         <span className="cursor-pointer">Sort by ▼</span>
       </div>
       {/* Main content area can go here */}
+      <SkillBox />
       <div className="mt-8"></div>
     </div>
   </div>
