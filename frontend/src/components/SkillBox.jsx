@@ -6,23 +6,21 @@ const SkillBox = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        // Use full URL in development
-        const apiUrl = process.env.NODE_ENV === 'development' 
-          ? 'http://localhost:8000/api/skills' 
-          : '/api/skills';
-
-        const response = await fetch(apiUrl, {
-          credentials: 'include', // Important for sessions/cookies
+        // Use absolute URL with environment variable
+        const response = await fetch(`${backendUrl}/api/skills`, {
+          credentials: 'include',
           headers: {
             'Accept': 'application/json',
           }
         });
-        
+
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`Server responded with ${response.status}`);
         }
 
         const data = await response.json();
@@ -30,8 +28,8 @@ const SkillBox = () => {
         setFilteredSkills(data);
         setIsLoading(false);
       } catch (err) {
-        console.error('Error fetching skills:', err);
-        setError(err.message || 'Failed to load skills');
+        console.error('Full error:', err);
+        setError(`Network error: ${err.message}. Please ensure the backend is running.`);
         setIsLoading(false);
       }
     };
