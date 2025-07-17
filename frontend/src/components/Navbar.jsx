@@ -1,12 +1,27 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useState, useRef, useEffect } from 'react';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef();
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
+    navigate('/login');
   };
 
   return (
@@ -32,12 +47,40 @@ const Navbar = () => {
               </Link>
             </>
           ) : (
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 text-white px-4 py-1 rounded-md font-medium hover:bg-red-700"
-            >
-              Logout
-            </button>
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen((open) => !open)}
+                className="flex items-center focus:outline-none"
+              >
+                <span className="inline-flex h-10 w-10 rounded-full bg-blue-200 flex items-center justify-center  text-blue-700 font-bold text-lg">
+                  {user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase()}
+                </span>
+              </button>
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-2 z-50">
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/connections"
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    View Connections
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

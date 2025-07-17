@@ -36,5 +36,13 @@ export const authService = {
   async getCurrentUser() {
     const response = await axios.get(`${ API_BASE_URL}/api/me`);
     return response.data;
-  }
+  },
+  async getConnections() {
+    const response = await axios.get(`${API_BASE_URL}/connections`);
+    return response.data;
+  },
+  async getRequests() {
+    const response = await axios.get(`${API_BASE_URL}/requests`);
+    return response.data;
+  },
 }; 
