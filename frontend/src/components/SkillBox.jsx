@@ -7,52 +7,34 @@ const SkillBox = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    
-    
-    // Temporary mock data for testing
-const mockSkills = [
-  {
-    title: "React Development",
-    description: "Building web applications with React",
-    owner_id: {
-      name: "John Doe",
-      email: "john@example.com"
-    }
-  },
-  {
-    title: "GraphQL API Design",
-    description: "Creating efficient GraphQL APIs",
-    owner_id: {
-      name: "Jane Smith",
-      email: "jane@example.com"
-    }
-  }
-];
+    const fetchSkills = async () => {
+      try {
+        // Use full URL in development
+        const apiUrl = process.env.NODE_ENV === 'development' 
+          ? 'http://localhost:8000/api/skills' 
+          : '/api/skills';
 
-// Then in your fetchSkills function:
-const fetchSkills = async () => {
-  try {
-    // For testing, use mock data instead of fetch
-    setAllSkills(mockSkills);
-    setFilteredSkills(mockSkills);
-    setIsLoading(false);
-    
-    // Comment out the actual fetch code temporarily
-    /*
-    const response = await fetch('/api/skills', {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        const response = await fetch(apiUrl, {
+          credentials: 'include', // Important for sessions/cookies
+          headers: {
+            'Accept': 'application/json',
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setAllSkills(data);
+        setFilteredSkills(data);
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error fetching skills:', err);
+        setError(err.message || 'Failed to load skills');
+        setIsLoading(false);
       }
-    });
-    // ... rest of your fetch code
-    */
-  } catch (err) {
-    console.error('Error:', err);
-    setError(err.message);
-    setIsLoading(false);
-  }
-};
+    };
 
     fetchSkills();
   }, []);
@@ -65,8 +47,8 @@ const fetchSkills = async () => {
     
     const term = searchTerm.toLowerCase();
     const filtered = allSkills.filter(skill => {
-      const titleMatch = skill.title.toLowerCase().includes(term);
-      const descMatch = skill.description && skill.description.toLowerCase().includes(term);
+      const titleMatch = skill.title?.toLowerCase().includes(term);
+      const descMatch = skill.description?.toLowerCase().includes(term);
       return titleMatch || descMatch;
     });
     
@@ -89,7 +71,7 @@ const fetchSkills = async () => {
     return (
       <div className="container">
         <div className="error">
-          Error loading skills: {error.message}
+          Error loading skills: {error}
           <button onClick={handleReload}>Try Again</button>
         </div>
       </div>
@@ -101,14 +83,12 @@ const fetchSkills = async () => {
       <div className="navbar">
         <div className="logo">SkillSwap</div>
         <div className="nav-links">
-          <a href="HomePage.html" className="login-btn">Back to Home</a>
+          <a href="/" className="login-btn">Back to Home</a>
         </div>
       </div>
 
       <div className="container">
-        <h1>All Skills</h1>
         
-        {/* Search Bar */}
         <div className="search-container">
           <input 
             type="text" 
@@ -118,7 +98,6 @@ const fetchSkills = async () => {
           />
         </div>
         
-        {/* Skills Container */}
         <div id="skills-container">
           {filteredSkills.length === 0 ? (
             allSkills.length === 0 ? (
@@ -130,7 +109,7 @@ const fetchSkills = async () => {
             <div className="skills-grid">
               {filteredSkills.map((skill, index) => (
                 <div className="skill-card" key={index}>
-                  <h3>{skill.title}</h3>
+                  <h3>{skill.title || 'Untitled Skill'}</h3>
                   <p>{skill.description || 'No description provided'}</p>
                   {skill.owner_id && (
                     <div className="owner-info">

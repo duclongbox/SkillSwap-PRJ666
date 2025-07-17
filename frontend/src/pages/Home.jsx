@@ -8,11 +8,6 @@ const Home = () => (
     <div className="max-w-3xl mx-auto py-10 px-4">
       <h2 className="text-2xl font-semibold text-center mb-6 mt-4">Insert Slogan Here</h2>
       <div className="flex justify-center mb-8">
-        <input
-          type="text"
-          placeholder="Search for any skills"
-          className="w-full max-w-xl px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
       </div>
       <div className="flex flex-wrap items-center justify-between border-b border-gray-200 pb-2 text-gray-700 text-sm">
         <div className="flex space-x-6">
