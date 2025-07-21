@@ -1,7 +1,6 @@
-//routes/userRoutes.js
 const express = require("express");
 const router = express.Router();
-const { User } = require("../DBModels");
+const { User } = require("../../models/DBModels");
 
 // GET /api/users - Get all users (only name and _id, e.g., for dropdowns)
 router.get("/", async (req, res) => {
@@ -32,8 +31,6 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { name, email, skills } = req.body;
-
-    // Optional: validate email or skills format here
 
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,

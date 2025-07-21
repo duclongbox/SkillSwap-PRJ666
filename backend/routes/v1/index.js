@@ -19,6 +19,9 @@ const {
     listRequest
 } = require('../../controllers/connectionController')
 
+// Import user routes
+const userRoutes = require('./userRoutes');
+
 const { Skill } = require('../../models/DBModels'); //for creating new skill listing
 
 
@@ -34,6 +37,8 @@ router.post('/api/logout', isAuthenticated, logoutFunction);
 router.get('/api/me', isAuthenticated, getCurrentUserFunction);
 router.get('/api/session-status', checkSessionStatus);
 
+// Mount user routes
+router.use('/api/users', userRoutes);
 
 // User Connection Routes
 router.post('/:recipientID/sendRequest',isAuthenticated,sendConnection );
