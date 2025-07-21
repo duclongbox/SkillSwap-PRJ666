@@ -15,34 +15,46 @@ const Profile = () => {
 
   useEffect(() => {
     if (user) {
+      console.log('User object:', user); // Debug log
       loadUserProfile();
     }
   }, [user]);
 
   const loadUserProfile = async () => {
     try {
-      // Use the environment variable for API base URL like other components
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-      const response = await fetch(`${API_BASE_URL}/api/users/${user.id}`, {
+      const userId = user.id || user._id; // Handle both possible ID formats
+      const url = `${API_BASE_URL}/api/users/${userId}`;
+      
+      console.log('Fetching profile from:', url); // Debug log
+      console.log('User ID being used:', userId); // Debug log
+      
+      const response = await fetch(url, {
         credentials: 'include',
         headers: {
           'Accept': 'application/json',
         }
       });
       
+      console.log('Response status:', response.status); // Debug log
+      
       if (response.ok) {
         const userData = await response.json();
+        console.log('Profile data received:', userData); // Debug log
         setProfileData({
           name: userData.name || '',
           email: userData.email || '',
           skills: userData.skills || []
         });
+        setMessage(''); // Clear any previous error messages
       } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('API Error:', response.status, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
     } catch (error) {
       console.error('Error loading profile:', error);
-      setMessage('Failed to load profile data');
+      setMessage(`Failed to load profile data: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -66,7 +78,8 @@ const Profile = () => {
   const handleSave = async () => {
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-      const response = await fetch(`${API_BASE_URL}/api/users/${user.id}`, {
+      const userId = user.id || user._id;
+      const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +107,7 @@ const Profile = () => {
       <div className="min-h-screen bg-gray-50">
         <Navbar />
         <div className="flex justify-center items-center h-64">
-          <div className="text-lg">Loading profile...</div>
+          <div className="text-lg text-gray-800">Loading profile...</div>
         </div>
       </div>
     );
@@ -120,7 +133,11 @@ const Profile = () => {
           </div>
 
           {message && (
-            <div className="mb-4 p-3 rounded-md bg-blue-50 text-blue-800">
+            <div className={`mb-4 p-3 rounded-md ${
+              message.includes('✅') 
+                ? 'bg-green-50 text-green-800' 
+                : 'bg-red-50 text-red-800'
+            }`}>
               {message}
             </div>
           )}
@@ -215,3 +232,4 @@ const Profile = () => {
 };
 
 export default Profile;
+
