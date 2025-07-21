@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
 // GET /api/users/:id - Get a specific user profile by ID
 router.get("/:id", async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select("name email skills");
+    const user = await User.findById(req.params.id).select("name email skills profilePicture");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -30,11 +30,11 @@ router.get("/:id", async (req, res) => {
 // PUT /api/users/:id - Update a user's profile
 router.put("/:id", async (req, res) => {
   try {
-    const { name, email, skills } = req.body;
+    const { name, email, skills, profilePicture } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      { name, email, skills },
+      { name, email, skills, profilePicture },
       { new: true, runValidators: true }
     );
 
@@ -49,6 +49,7 @@ router.put("/:id", async (req, res) => {
         name: updatedUser.name,
         email: updatedUser.email,
         skills: updatedUser.skills,
+        profilePicture: updatedUser.profilePicture,
       }
     });
   } catch (error) {

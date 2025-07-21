@@ -52,21 +52,65 @@ router.get('/connections',isAuthenticated, listConnections);
 // Create Skill Listing
 router.post('/api/skills', isAuthenticated, async (req, res) => {
   try {
-    const { title, category, description, exchangeSkills } = req.body;
+    const { 
+      title, 
+      category, 
+      description, 
+      exchangeSkills, 
+      skillLevel, 
+      availability, 
+      duration 
+    } = req.body;
+
+    // Validation
+    if (!title || !category || !description || !exchangeSkills) {
+      return res.status(400).json({ 
+        message: 'Title, category, description, and exchange skills are required' 
+      });
+    }
+
+    if (title.length < 3) {
+      return res.status(400).json({ 
+        message: 'Title must be at least 3 characters long' 
+      });
+    }
+
+    if (description.length < 20) {
+      return res.status(400).json({ 
+        message: 'Description must be at least 20 characters long' 
+      });
+    }
+
     const skill = new Skill({
-      title,
+      title: title.trim(),
       category,
-      description,
+      description: description.trim(),
       owner_id: req.user._id,
-      exchangeSkills
+      exchangeSkills: Array.isArray(exchangeSkills) ? exchangeSkills : [exchangeSkills],
+      skillLevel: skillLevel || 'Beginner',
+      availability: availability || 'Flexible',
+      duration: duration || '1-2 hours'
     });
+
     await skill.save();
-    res.status(201).json({ message: 'Skill created', skill });
+    
+    // Populate owner info for response
+    await skill.populate('owner_id', 'name email');
+    
+    res.status(201).json({ 
+      message: 'Skill created successfully', 
+      skill 
+    });
   } catch (err) {
+    console.error('Error creating skill:', err);
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ 
+        message: 'Validation error: ' + Object.values(err.errors).map(e => e.message).join(', ')
+      });
+    }
     res.status(500).json({ message: 'Error creating skill' });
   }
-});
-// Get skill details page
+}); // Get skill details page
 router.get('/api/skills/:id', async (req, res) => {
   try {
     const skill = await Skill.findById(req.params.id).populate('owner_id', 'email');

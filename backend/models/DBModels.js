@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   password: String,
   verified: Boolean,
   skills: [String],
+  profilePicture: String, // Base64 encoded image or URL
   connections:  [{ type: mongoose.Schema.Types.ObjectId, ref: "Connection" }],
 });
 
@@ -18,11 +19,15 @@ const adminSchema = new mongoose.Schema({
 
 const skillSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  category: { type: String, required: true }, // new
+  category: { type: String, required: true },
   owner_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  exchangeSkills: [String], // new
+  exchangeSkills: [String],
   description: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now } 
+  skillLevel: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced', 'Expert'], default: 'Beginner' },
+  availability: { type: String, enum: ['Flexible', 'Weekdays', 'Weekends', 'Evenings'], default: 'Flexible' },
+  duration: { type: String, enum: ['30 minutes', '1-2 hours', '2-4 hours', 'Half day', 'Full day', 'Multiple sessions'], default: '1-2 hours' },
+  createdAt: { type: Date, default: Date.now },
+  isActive: { type: Boolean, default: true }
 });
 
 const connectionSchema = new mongoose.Schema(
