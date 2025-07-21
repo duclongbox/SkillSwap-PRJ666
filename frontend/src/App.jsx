@@ -8,6 +8,7 @@ import Skills from './pages/Skills'
 import ServiceDetail from './pages/ServiceDetail';
 import CreateSkill from './pages/CreateSkill';
 import Connections from './pages/Connection';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -15,17 +16,21 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
-            <Route
-              path="/"
-              element={
-                //<ProtectedRoute>
-                  <Home />
-                //</ProtectedRoute>
-              }
-            />
+            <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/skills" element={<Skills/>}/>
+            
+            {/* Profile Route */}
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            
             {/* Connection Routes */}
             <Route
               path="/connections"
@@ -35,7 +40,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            {/*route for CreateSkill */}
+            
+            {/* Other protected routes */}
             <Route
               path="/create-skill"
               element={
