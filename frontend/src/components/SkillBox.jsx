@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+
 
 const SkillBox = () => {
   const [allSkills, setAllSkills] = useState([]);
   const [filteredSkills, setFilteredSkills] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sentRequests, setSentRequests] = useState([]);
+  const { user } = useAuth();
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+  const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
   useEffect(() => {
     const fetchSkills = async () => {
@@ -42,14 +46,14 @@ const SkillBox = () => {
       setFilteredSkills(allSkills);
       return;
     }
-    
+
     const term = searchTerm.toLowerCase();
     const filtered = allSkills.filter(skill => {
       const titleMatch = skill.title?.toLowerCase().includes(term);
       const descMatch = skill.description?.toLowerCase().includes(term);
       return titleMatch || descMatch;
     });
-    
+
     setFilteredSkills(filtered);
   };
 
@@ -75,6 +79,27 @@ const SkillBox = () => {
       </div>
     );
   }
+  const handleConnect = async (recipientID) => {
+    try {
+      const response = await fetch(`${backendUrl}/${recipientID}/sendRequest`, {
+        method: 'POST',
+        credentials: 'include', // if using cookies/session
+        headers: {
+          'Content-Type': 'application/json',
+          // Add Authorization header if using JWT
+        }
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to send connection request');
+        return;
+      }
+      alert('Connection request sent!');
+      setSentRequests(prev => [...prev, recipientID]); 
+    } catch (err) {
+      alert('Error sending connection request: ' + err.message);
+    }
+  };
 
   return (
     <div>
@@ -86,16 +111,16 @@ const SkillBox = () => {
       </div>
 
       <div className="container">
-        
+
         <div className="search-container">
-          <input 
-            type="text" 
-            id="search-input" 
+          <input
+            type="text"
+            id="search-input"
             placeholder="Search skills by title or description..."
             onChange={(e) => filterSkills(e.target.value)}
           />
         </div>
-        
+
         <div id="skills-container">
           {filteredSkills.length === 0 ? (
             allSkills.length === 0 ? (
@@ -107,13 +132,22 @@ const SkillBox = () => {
             <div className="skills-grid">
               {filteredSkills.map((skill, index) => (
                 <div className="skill-card" key={index}>
-                  <h3>{skill.title || 'Untitled Skill'}</h3>
-                  <p>{skill.description || 'No description provided'}</p>
-                  {skill.owner_id && (
-                    <div className="owner-info">
+                  <h3 className="text-xl font-semibold text-blue-900">{skill.title || 'Untitled Skill'}</h3>
+                  <p className="text-gray-700">{skill.description || 'No description provided'}</p>
+                  {/* Owner info and Connect button in a row */}
+                  <div className="flex items-center justify-between mt-4">
+                    <div className="owner-info text-gray-500 text-sm">
                       Added by: {skill.owner_id.name} ({skill.owner_id.email})
                     </div>
-                  )}
+                    {user && skill.owner_id && user._id !== skill.owner_id._id && !sentRequests.includes(skill.owner_id._id) && (
+                      <button
+                        className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
+                        onClick={() => handleConnect(skill.owner_id._id)}
+                      >
+                        Connect
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
