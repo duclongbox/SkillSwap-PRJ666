@@ -253,14 +253,14 @@ const Connections = () => {
                           <div key={conn._id} className="group bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center space-x-4 mb-4">
                               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                                {(conn.recipient?.name || conn.recipient?.email || 'U').charAt(0).toUpperCase()}
+                                {(conn.sender?.name || conn.sender?.email || 'U').charAt(0).toUpperCase()}
                               </div>
                               <div className="flex-1">
                                 <h4 className="font-bold text-gray-900 text-lg">
-                                  {conn.recipient?.name || conn.recipient?.email || 'Unknown User'}
+                                  {conn.sender?.name || conn.sender?.email || 'Unknown User'}
                                 </h4>
                                 <p className="text-gray-500 text-sm">
-                                  {conn.recipient?.email && conn.recipient?.name ? conn.recipient.email : ''}
+                                  {conn.sender?.email && conn.sender?.name ? conn.sender.email : ''}
                                 </p>
                               </div>
                             </div>
