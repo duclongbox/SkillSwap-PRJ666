@@ -1,6 +1,16 @@
 // Middleware to check if user is authenticated
 const isAuthenticated = (req, res, next) => {
+    console.log('=== Authentication Check ===');
+    console.log('Session ID:', req.sessionID);
+    console.log('Session:', req.session);
+    console.log('User:', req.user);
+    console.log('Is Authenticated:', req.isAuthenticated());
+    console.log('Request Path:', req.path);
+    console.log('Request Method:', req.method);
+    console.log('Headers:', req.headers);
+    console.log('==========================');
     if (req.isAuthenticated()) {
+
         return next();
     }
     // for api requests
