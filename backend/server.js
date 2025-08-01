@@ -37,7 +37,6 @@ app.use(session({
     maxAge: 24 * 60 * 60 * 1000,
     sameSite: 'none', // Add this for cross-domain
     httpOnly: true,
-    secure: true
   },
   name: "sessionID"
 }));
