@@ -33,12 +33,12 @@ router.get('/login', isNotAuthenticated, renderLoginPage);
 // Authentication routes
 router.post('/api/register', isNotAuthenticated, registerFunction);
 router.post('/api/login', isNotAuthenticated, passport.authenticate('local'), loginFunction);
-router.post('/api/logout', isAuthenticated, logoutFunction);
+router.post('/api/logout', logoutFunction);
 router.get('/api/me', isAuthenticated, getCurrentUserFunction);
 router.get('/api/session-status', checkSessionStatus);
 
 // Mount user routes
-router.use('/api/users', userRoutes);
+router.use('/api/users', isAuthenticated,userRoutes); 
 
 // User Connection Routes
 router.post('/:recipientID/sendRequest',isAuthenticated,sendConnection );
