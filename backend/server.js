@@ -17,7 +17,9 @@ const PORT = process.env.PORT || 8000;
 // CORS Configuration
 app.use(cors({
   origin: process.env.CLIENT_URL,
-  credentials: true
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  // allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }));
 
 // Middleware
@@ -32,7 +34,9 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000
+    maxAge: 24 * 60 * 60 * 1000,
+    sameSite: 'none', // Add this for cross-domain
+    httpOnly: true
   },
   name: "sessionID"
 }));
