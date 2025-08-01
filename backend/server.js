@@ -75,6 +75,7 @@
 // };
 
 // server();
+
 const express = require('express');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
@@ -84,7 +85,7 @@ const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const apiRouter = require('./routes/v1/index');
-
+const path = require('path'); // Added path for consistency
 
 // Import passport configuration
 require('./config/passport');
@@ -93,31 +94,37 @@ const app = express();
 dotenv.config();
 
 const PORT = process.env.PORT || 8000;
+const isProduction = process.env.NODE_ENV === 'production';
 
+// CORS Configuration
 app.use(cors({
   origin: process.env.CLIENT_URL,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // <-- Added back methods
   credentials: true,
 }));
 
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Session configuration with MongoStore
+// Session configuration with MongoStore - CORRECTED
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: process.env.MONGO_URI,
-    collectionName: 'sessions', // Collection name for sessions
-    ttl: 24 * 60 * 60, // Session TTL in seconds (24 hours)
-    autoRemove: 'native' // Use MongoDB's TTL index
+    collectionName: 'sessions',
+    ttl: 24 * 60 * 60,
+    autoRemove: 'native'
   }),
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    // Corrected SameSite and Secure configuration
+    sameSite: isProduction ? 'none' : 'lax', // <-- CRITICAL FIX: Added conditional SameSite
+    secure: isProduction,                     // <-- CRITICAL FIX: Ensure secure is conditional
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000,
   },
   name: "sessionID"
 }));
@@ -134,6 +141,12 @@ app.get('/', (req, res) => {
     res.json({ message: 'SkillSwap API is running' });
 });
 
+// Landing page route (assuming you had one before)
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'login.html'));
+});
+
+
 const server = async () => {
   try {
     // Connect to MongoDB
@@ -149,7 +162,7 @@ const server = async () => {
     });
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
-    process.exit(1); 
+    process.exit(1);
   }
 }
 server();
