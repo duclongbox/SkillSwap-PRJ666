@@ -45,6 +45,8 @@ const registerFunction = async (req, res) => {
 
 // Login function
 const loginFunction = (req, res) => {
+    console.log('User logged in successfully');
+    console.log('Session ID:', req.sessionID);
     res.json({
         message: 'Login successful',
         user: {
