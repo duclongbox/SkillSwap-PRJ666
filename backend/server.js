@@ -95,6 +95,7 @@ dotenv.config();
 
 const PORT = process.env.PORT || 8000;
 const isProduction = process.env.NODE_ENV === 'production';
+console.log(isProduction);  
 
 // CORS Configuration
 app.use(cors({
@@ -121,8 +122,8 @@ app.use(session({
   }),
   cookie: {
     // Corrected SameSite and Secure configuration
-    sameSite: isProduction ? 'none' : 'lax', // <-- CRITICAL FIX: Added conditional SameSite
-    secure: isProduction,                     // <-- CRITICAL FIX: Ensure secure is conditional
+    sameSite: isProduction ? 'none' : 'lax', 
+    secure: isProduction,                     
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
   },
@@ -141,10 +142,7 @@ app.get('/', (req, res) => {
     res.json({ message: 'SkillSwap API is running' });
 });
 
-// Landing page route (assuming you had one before)
-app.get('/login.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'login.html'));
-});
+
 
 
 const server = async () => {

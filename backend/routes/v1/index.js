@@ -26,9 +26,7 @@ const { Skill } = require('../../models/DBModels'); //for creating new skill lis
 
 
 
-// Render routes
-router.get('/', renderHomePage);
-router.get('/login', isNotAuthenticated, renderLoginPage);
+
 
 // Authentication routes
 router.post('/api/register', isNotAuthenticated, registerFunction);
@@ -41,11 +39,11 @@ router.get('/api/session-status', checkSessionStatus);
 router.use('/api/users', isAuthenticated,userRoutes); 
 
 // User Connection Routes
-router.post('/:recipientID/sendRequest',isAuthenticated,sendConnection );
-router.post('/:connectionID/accept',isAuthenticated, acceptRequest);
-router.post('/:connectionID/decline',isAuthenticated, declineRequest);
-router.get('/requests',isAuthenticated, listRequest);
-router.get('/connections',isAuthenticated, listConnections);
+router.post('/api/:recipientID/sendRequest',isAuthenticated,sendConnection );
+router.post('/api/:connectionID/accept',isAuthenticated, acceptRequest);
+router.post('/api/:connectionID/decline',isAuthenticated, declineRequest);
+router.get('/api/requests',isAuthenticated, listRequest);
+router.get('/api/connections',isAuthenticated, listConnections);
 
 
 

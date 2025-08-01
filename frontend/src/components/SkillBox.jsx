@@ -81,7 +81,7 @@ const SkillBox = () => {
   }
   const handleConnect = async (recipientID) => {
     try {
-      const response = await fetch(`${backendUrl}/${recipientID}/sendRequest`, {
+      const response = await fetch(`${backendUrl}/api/${recipientID}/sendRequest`, {
         method: 'POST',
         credentials: 'include', // if using cookies/session
         headers: {

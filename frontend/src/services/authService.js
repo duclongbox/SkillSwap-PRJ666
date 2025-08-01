@@ -38,16 +38,16 @@ export const authService = {
     return response.data;
   },
   async getConnections() {
-    const response = await axios.get(`${API_BASE_URL}/connections`);
+    const response = await axios.get(`${API_BASE_URL}/api/connections`);
     return response.data;
   },
   async getRequests() {
-    const response = await axios.get(`${API_BASE_URL}/requests`);
+    const response = await axios.get(`${API_BASE_URL}/api/requests`);
     return response.data;
   },
   async declineRequest(requestId) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/${requestId}/decline`)
+      const response = await axios.post(`${API_BASE_URL}/api/${requestId}/decline`)
   
       return response.data;
     } catch (error) {
@@ -56,7 +56,7 @@ export const authService = {
   },
   async acceptRequest(requestId) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/${requestId}/accept`)
+      const response = await axios.post(`${API_BASE_URL}/api/${requestId}/accept`)
   
       return response.data;
     } catch (error) {
