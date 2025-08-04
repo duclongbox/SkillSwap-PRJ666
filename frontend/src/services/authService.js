@@ -10,6 +10,8 @@ export const authService = {
     const response = await axios.post(`${API_BASE_URL}/api/login`, {
       email,
       password
+    },{
+      withCredentials: true
     });
     return response.data;
   },
@@ -19,6 +21,8 @@ export const authService = {
       name,
       email,
       password
+    },{
+      withCredentials: true
     });
     return response.data;
   },
