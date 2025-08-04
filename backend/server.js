@@ -98,7 +98,7 @@ console.log(isProduction);
 
 // CORS Configuration
 app.use(cors({
-  origin: '*',
+  origin: process.env.CLIENT_URL,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
   credentials: true,
 }));
