@@ -24,31 +24,48 @@ export const authService = {
   },
 
   async logout() {
-    const response = await axios.post(`${API_BASE_URL}/api/logout`);
+    const response = await axios.post(`${API_BASE_URL}/api/logout`,
+      {
+        withCredentials: true
+      }
+    );
     return response.data;
   },
 
   async checkSessionStatus() {
-    const response = await axios.get(`${API_BASE_URL}/api/session-status`);
+    const response = await axios.get(`${API_BASE_URL}/api/session-status`,
+      {
+        withCredentials: true
+      }
+    );
     return response.data;
   },
 
   async getCurrentUser() {
-    const response = await axios.get(`${API_BASE_URL}/api/me`);
+    const response = await axios.get(`${API_BASE_URL}/api/me`,
+      {
+        withCredentials: true
+      }
+    );
     return response.data;
   },
   async getConnections() {
-    const response = await axios.get(`${API_BASE_URL}/api/connections`);
+    const response = await axios.get(`${API_BASE_URL}/api/connections`,{
+      withCredentials: true
+    });
     return response.data;
   },
   async getRequests() {
-    const response = await axios.get(`${API_BASE_URL}/api/requests`);
+    const response = await axios.get(`${API_BASE_URL}/api/requests`,{
+      withCredentials: true
+    });
     return response.data;
   },
   async declineRequest(requestId) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/${requestId}/decline`)
-  
+      const response = await axios.post(`${API_BASE_URL}/api/${requestId}/decline`,{
+        withCredentials: true
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data?.message || error.message || 'Failed to decline the request'
@@ -56,7 +73,9 @@ export const authService = {
   },
   async acceptRequest(requestId) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/${requestId}/accept`)
+      const response = await axios.post(`${API_BASE_URL}/api/${requestId}/accept`,{
+        withCredentials: true
+      });
   
       return response.data;
     } catch (error) {
