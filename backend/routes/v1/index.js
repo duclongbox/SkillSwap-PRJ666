@@ -19,7 +19,7 @@ const {
     listRequest
 } = require('../../controllers/connectionController')
 
-// Import user routes
+// Import user routes v1 
 const userRoutes = require('./userRoutes');
 
 const { Skill } = require('../../models/DBModels'); //for creating new skill listing
