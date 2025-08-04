@@ -10,8 +10,6 @@ export const authService = {
     const response = await axios.post(`${API_BASE_URL}/api/login`, {
       email,
       password
-    },{
-      withCredentials: true
     });
     return response.data;
   },
@@ -21,55 +19,36 @@ export const authService = {
       name,
       email,
       password
-    },{
-      withCredentials: true
     });
     return response.data;
   },
 
   async logout() {
-    const response = await axios.post(`${API_BASE_URL}/api/logout`,
-      {
-        withCredentials: true
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/api/logout`);
     return response.data;
   },
 
   async checkSessionStatus() {
-    const response = await axios.get(`${API_BASE_URL}/api/session-status`,
-      {
-        withCredentials: true
-      }
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/session-status`);
     return response.data;
   },
 
   async getCurrentUser() {
-    const response = await axios.get(`${API_BASE_URL}/api/me`,
-      {
-        withCredentials: true
-      }
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/me`);
     return response.data;
   },
   async getConnections() {
-    const response = await axios.get(`${API_BASE_URL}/api/connections`,{
-      withCredentials: true
-    });
+    const response = await axios.get(`${API_BASE_URL}/api/connections`);
     return response.data;
   },
   async getRequests() {
-    const response = await axios.get(`${API_BASE_URL}/api/requests`,{
-      withCredentials: true
-    });
+    const response = await axios.get(`${API_BASE_URL}/api/requests`);
     return response.data;
   },
   async declineRequest(requestId) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/${requestId}/decline`,{
-        withCredentials: true
-      });
+      const response = await axios.post(`${API_BASE_URL}/api/${requestId}/decline`)
+  
       return response.data;
     } catch (error) {
       throw error.response?.data?.message || error.message || 'Failed to decline the request'
@@ -77,9 +56,7 @@ export const authService = {
   },
   async acceptRequest(requestId) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/${requestId}/accept`,{
-        withCredentials: true
-      });
+      const response = await axios.post(`${API_BASE_URL}/api/${requestId}/accept`)
   
       return response.data;
     } catch (error) {
