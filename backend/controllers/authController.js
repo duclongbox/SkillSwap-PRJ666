@@ -48,12 +48,18 @@ const loginFunction = (req, res) => {
     console.log('User logged in successfully');
     console.log('Session ID:', req.sessionID);
     console.log('User:', req.user);
-    res.json({
-        message: 'Login successful',
-        user: {
-            id: req.user._id,
-            email: req.user.email
+    req.session.save((err) => {
+        if (err) {
+          console.error('Error saving session:', err);
+          return res.status(500).json({ message: 'Session save error' });
         }
+        res.json({
+          message: 'Login successful',
+          user: {
+            id: req.user._id,
+            email: req.user.email,
+          },
+        });
     });
 };
 
