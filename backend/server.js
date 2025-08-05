@@ -94,7 +94,8 @@ dotenv.config();
 
 const PORT = process.env.PORT || 8000;
 const isProduction = process.env.NODE_ENV === 'production';
-console.log(isProduction);  
+
+app.set('trust proxy', 1);
 
 // CORS Configuration
 app.use(cors({
