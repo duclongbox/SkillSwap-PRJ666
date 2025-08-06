@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-
+import { Link } from 'react-router-dom';
 
 const SkillBox = () => {
   const [allSkills, setAllSkills] = useState([]);
@@ -15,7 +15,6 @@ const SkillBox = () => {
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        // Use absolute URL with environment variable
         const response = await fetch(`${backendUrl}/api/skills`, {
           credentials: 'include',
           headers: {
@@ -61,6 +60,28 @@ const SkillBox = () => {
     window.location.reload();
   };
 
+  const handleConnect = async (recipientID, e) => {
+    e.preventDefault(); // Prevent card link from triggering
+    try {
+      const response = await fetch(`${backendUrl}/${recipientID}/sendRequest`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to send connection request');
+        return;
+      }
+      alert('Connection request sent!');
+      setSentRequests(prev => [...prev, recipientID]);
+    } catch (err) {
+      alert('Error sending connection request: ' + err.message);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="container">
@@ -79,39 +100,10 @@ const SkillBox = () => {
       </div>
     );
   }
-  const handleConnect = async (recipientID) => {
-    try {
-      const response = await fetch(`${backendUrl}/${recipientID}/sendRequest`, {
-        method: 'POST',
-        credentials: 'include', // if using cookies/session
-        headers: {
-          'Content-Type': 'application/json',
-          // Add Authorization header if using JWT
-        }
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert(errorData.message || 'Failed to send connection request');
-        return;
-      }
-      alert('Connection request sent!');
-      setSentRequests(prev => [...prev, recipientID]); 
-    } catch (err) {
-      alert('Error sending connection request: ' + err.message);
-    }
-  };
 
   return (
     <div>
-      <div className="navbar">
-        <div className="logo">SkillSwap</div>
-        <div className="nav-links">
-          <a href="/" className="login-btn">Back to Home</a>
-        </div>
-      </div>
-
       <div className="container">
-
         <div className="search-container">
           <input
             type="text"
@@ -131,24 +123,25 @@ const SkillBox = () => {
           ) : (
             <div className="skills-grid">
               {filteredSkills.map((skill, index) => (
-                <div className="skill-card" key={index}>
-                  <h3 className="text-xl font-semibold text-blue-900">{skill.title || 'Untitled Skill'}</h3>
-                  <p className="text-gray-700">{skill.description || 'No description provided'}</p>
-                  {/* Owner info and Connect button in a row */}
-                  <div className="flex items-center justify-between mt-4">
-                    <div className="owner-info text-gray-500 text-sm">
-                      Added by: {skill.owner_id.name} ({skill.owner_id.email})
+                <Link to={`/service/${skill._id}`} key={index} className="skill-card-link">
+                  <div className="skill-card">
+                    <h3 className="text-xl font-semibold text-blue-900">{skill.title || 'Untitled Skill'}</h3>
+                    <p className="text-gray-700">{skill.description || 'No description provided'}</p>
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="owner-info text-gray-500 text-sm">
+                        Added by: {skill.owner_id.name} ({skill.owner_id.email})
+                      </div>
+                      {user && skill.owner_id && user._id !== skill.owner_id._id && !sentRequests.includes(skill.owner_id._id) && (
+                        <button
+                          className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
+                          onClick={(e) => handleConnect(skill.owner_id._id, e)}
+                        >
+                          Connect
+                        </button>
+                      )}
                     </div>
-                    {user && skill.owner_id && user._id !== skill.owner_id._id && !sentRequests.includes(skill.owner_id._id) && (
-                      <button
-                        className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
-                        onClick={() => handleConnect(skill.owner_id._id)}
-                      >
-                        Connect
-                      </button>
-                    )}
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
@@ -156,20 +149,9 @@ const SkillBox = () => {
       </div>
 
       <style jsx>{`
-        body {
-          font-family: Arial, sans-serif;
-          margin: 0;
-          padding: 20px;
-          background-color: #f5f5f5;
-        }
         .container {
           max-width: 1200px;
           margin: 0 auto;
-        }
-        h1 {
-          text-align: center;
-          color: #333;
-          margin-bottom: 20px;
         }
         .search-container {
           display: flex;
@@ -197,6 +179,10 @@ const SkillBox = () => {
           gap: 20px;
           margin-top: 10px;
         }
+        .skill-card-link {
+          text-decoration: none;
+          color: inherit;
+        }
         .skill-card {
           background-color: white;
           border-radius: 8px;
@@ -207,13 +193,6 @@ const SkillBox = () => {
         .skill-card:hover {
           transform: translateY(-5px);
           box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .skill-card h3 {
-          margin-top: 0;
-          color: #2c3e50;
-        }
-        .skill-card p {
-          color: #666;
         }
         .owner-info {
           margin-top: 15px;
@@ -242,11 +221,7 @@ const SkillBox = () => {
           border-radius: 4px;
           cursor: pointer;
         }
-        .no-skills {
-          text-align: center;
-          padding: 20px;
-          color: #666;
-        }
+        .no-skills,
         .no-results {
           text-align: center;
           padding: 20px;

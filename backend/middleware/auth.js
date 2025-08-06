@@ -55,8 +55,43 @@ const handleSessionExpiry = (req, res, next) => {
     next();
 };
 
+const { Skill } = require('../models/DBModels');
+
+// Middleware to check if user is admin
+const isAdmin = (req, res, next) => {
+    if (req.user?.role === 'admin') {
+        return next();
+    }
+    return res.status(403).json({ message: 'Forbidden: Admin access required' });
+};
+
+// Middleware to check if user is skill owner or admin
+const isSkillOwnerOrAdmin = async (req, res, next) => {
+    try {
+        const skill = await Skill.findById(req.params.id);
+        if (!skill) {
+            return res.status(404).json({ message: 'Skill not found' });
+        }
+
+        const isOwner = skill.owner_id.toString() === req.user._id.toString();
+        const isAdminUser = req.user.role === 'admin';
+
+        if (!isOwner && !isAdminUser) {
+            return res.status(403).json({ message: 'Forbidden: Not allowed to modify this skill' });
+        }
+
+        next();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
 module.exports = {
     isAuthenticated,
     isNotAuthenticated,
-    handleSessionExpiry
+    handleSessionExpiry,
+    isAdmin,
+    isSkillOwnerOrAdmin
 };
