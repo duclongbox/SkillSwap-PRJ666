@@ -11,14 +11,13 @@ const ServiceDetail = () => {
 
   const [service, setService] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [hasSentRequest, setHasSentRequest] = useState(false);
 
   useEffect(() => {
-    // Fetch skill details
     axios.get(`${API_BASE_URL}/api/skills/${id}`, { withCredentials: true })
       .then(res => setService(res.data))
       .catch(err => console.error('Error fetching skill:', err));
 
-    // Fetch logged-in user info
     axios.get(`${API_BASE_URL}/api/me`, { withCredentials: true })
       .then(res => setCurrentUser(res.data.user))
       .catch(() => setCurrentUser(null));
@@ -26,11 +25,9 @@ const ServiceDetail = () => {
 
   if (!service) return <p className="text-center mt-10 text-gray-600">Loading...</p>;
 
-  // Determine if current user is skill owner or admin
   const isAuthorized = currentUser &&
-    (currentUser.id === service.owner_id?.id || currentUser.role === 'admin');
+    (currentUser.id === (service.owner_id?._id || service.owner_id) || currentUser.role === 'admin');
 
-  // Handle skill deletion
   const handleDelete = async () => {
     const confirmDelete = confirm('Are you sure you want to delete this skill?');
     if (!confirmDelete) return;
@@ -47,10 +44,28 @@ const ServiceDetail = () => {
     }
   };
 
+  const handleConnect = async () => {
+    try {
+      const recipientID = service.owner_id?._id;
+      if (!recipientID) return;
+
+      await axios.post(`${API_BASE_URL}/${recipientID}/sendRequest`, {}, {
+        withCredentials: true
+      });
+
+      alert('Connection request sent!');
+      setHasSentRequest(true);
+    } catch (err) {
+      console.error(err);
+      alert('Error sending request: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <Navbar />
 
+      {/* Hero */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
         <div className="absolute inset-0">
@@ -75,58 +90,58 @@ const ServiceDetail = () => {
         </div>
       </div>
 
+      {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 pb-16 -mt-8">
         <section className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8 mb-10">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">{service.title || 'Untitled'}</h2>
 
-          <p className="text-sm text-gray-700 mb-2">
-            <strong>Category:</strong> {service.category || 'Uncategorized'}
-          </p>
-          <p className="text-sm text-gray-700 mb-2">
-            <strong>Offered by:</strong> {service.owner_id?.email || 'Unknown'}
-          </p>
-          <p className="text-sm text-gray-700 mb-6">
-            <strong>Exchange using:</strong>{' '}
-            {Array.isArray(service.exchangeSkills)
-              ? service.exchangeSkills.join(', ')
-              : 'Not specified'}
-          </p>
+          <p className="text-sm text-gray-700 mb-2"><strong>Category:</strong> {service.category}</p>
+          <p className="text-sm text-gray-700 mb-2"><strong>Skill Level:</strong> {service.skillLevel}</p>
+          <p className="text-sm text-gray-700 mb-2"><strong>Availability:</strong> {service.availability}</p>
+          <p className="text-sm text-gray-700 mb-2"><strong>Duration:</strong> {service.duration}</p>
+          <p className="text-sm text-gray-700 mb-2"><strong>Status:</strong> {service.isActive ? 'Active' : 'Inactive'}</p>
+          <p className="text-sm text-gray-700 mb-2"><strong>Posted on:</strong> {new Date(service.createdAt).toLocaleDateString()}</p>
+          <p className="text-sm text-gray-700 mb-6"><strong>Offered by:</strong> {service.owner_id?.email}</p>
+
+          <p className="text-sm text-gray-700 mb-6"><strong>Exchange using:</strong> {Array.isArray(service.exchangeSkills) ? service.exchangeSkills.join(', ') : 'Not specified'}</p>
 
           <h3 className="text-blue-600 font-medium text-lg mb-2">Description</h3>
           <pre className="bg-gray-100 p-4 rounded text-sm text-gray-800 whitespace-pre-wrap">
-            {service.description || 'No description provided.'}
+            {service.description}
           </pre>
 
-          <button className="mt-6 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white text-sm rounded-xl font-semibold shadow-md transform transition-all duration-200 hover:scale-105">
-            Send Skill Offer
-          </button>
-
-          {isAuthorized && (
-            <div className="flex gap-4 mt-6">
+          <div className="flex flex-wrap gap-4 mt-6">
+            {currentUser && service.owner_id && currentUser.id !== service.owner_id._id && !hasSentRequest && (
               <button
-                onClick={() => navigate(`/skills/edit/${service._id}`)}
-                className="px-5 py-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded-lg text-sm font-semibold shadow"
+                onClick={handleConnect}
+                className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-xl font-semibold shadow-md transform transition-all duration-200 hover:scale-105"
               >
-                Edit
+                Connect
               </button>
+            )}
 
-              <button
-                onClick={handleDelete}
-                className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold shadow"
-              >
-                Delete
-              </button>
-            </div>
-          )}
+            {isAuthorized && (
+              <>
+                {/* <button
+                  onClick={() => navigate(`/skills/edit/${service._id}`)}
+                  className="px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-white text-sm rounded-xl font-semibold shadow-md transform transition-all duration-200 hover:scale-105"
+                >
+                  Edit
+                </button> */}
+                <button
+                  onClick={handleDelete}
+                  className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white text-sm rounded-xl font-semibold shadow-md transform transition-all duration-200 hover:scale-105"
+                >
+                  Delete
+                </button>
+              </>
+            )}
+          </div>
         </section>
 
         <aside className="bg-white/80 backdrop-blur-sm border-l-4 border-gray-300 rounded-2xl p-6 text-sm text-gray-700 shadow-lg">
-          <h3 className="text-gray-800 font-medium text-base mb-2">
-            Filter by Category (coming soon)
-          </h3>
-          <p>
-            You’ll be able to filter and search services by categories like Design, Coding, Language, etc.
-          </p>
+          <h3 className="text-gray-800 font-medium text-base mb-2">Filter by Category (coming soon)</h3>
+          <p>You’ll be able to filter and search services by categories like Design, Coding, Language, etc.</p>
         </aside>
       </main>
     </div>
