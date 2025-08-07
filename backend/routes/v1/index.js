@@ -2,11 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const chatRoutes = require("./chatRoutes");
-const {
-  isAuthenticated,
-  isNotAuthenticated,
-  handleSessionExpiry,
-} = require("../../middleware/auth");
+const { isAuthenticated, isNotAuthenticated, handleSessionExpiry,} = require("../../middleware/auth");
 const {
   registerFunction,
   loginFunction,
@@ -21,13 +17,15 @@ const {
   acceptRequest,
   declineRequest,
   listConnections,
-  listRequest,
+  listRequest
 } = require("../../controllers/connectionController");
 
-// Import user routes v1
-const userRoutes = require("./userRoutes");
+// Import user routes v1 
+const userRoutes = require('./userRoutes');
 
-const { Skill } = require("../../models/DBModels"); //for creating new skill listing
+const { Skill } = require('../../models/DBModels'); //for creating new skill listing
+
+
 
 // Render routes
 router.get("/", renderHomePage);
@@ -159,22 +157,17 @@ router.get("/api/skills", async (req, res) => {
 });
 
 // UPDATE skill listing
-router.put("/api/skills/:id", isAuthenticated, async (req, res) => {
+router.put('/api/skills/:id', isAuthenticated, async (req, res) => {
   try {
     const skill = await Skill.findById(req.params.id);
 
     if (!skill) {
-      return res.status(404).json({ message: "Skill not found" });
+      return res.status(404).json({ message: 'Skill not found' });
     }
 
     // Only owner or admin can update
-    if (
-      skill.owner_id.toString() !== req.user._id.toString() &&
-      req.user.role !== "admin"
-    ) {
-      return res
-        .status(403)
-        .json({ message: "Unauthorized to update this skill" });
+    if (skill.owner_id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Unauthorized to update this skill' });
     }
 
     const updates = req.body;
@@ -182,38 +175,34 @@ router.put("/api/skills/:id", isAuthenticated, async (req, res) => {
     Object.assign(skill, updates);
     await skill.save();
 
-    res.status(200).json({ message: "Skill updated successfully", skill });
+    res.status(200).json({ message: 'Skill updated successfully', skill });
   } catch (err) {
-    console.error("Error updating skill:", err);
-    res.status(500).json({ message: "Error updating skill" });
+    console.error('Error updating skill:', err);
+    res.status(500).json({ message: 'Error updating skill' });
   }
 });
 
 // DELETE skill listing
-router.delete("/api/skills/:id", isAuthenticated, async (req, res) => {
+router.delete('/api/skills/:id', isAuthenticated, async (req, res) => {
   try {
     const skill = await Skill.findById(req.params.id);
 
     if (!skill) {
-      return res.status(404).json({ message: "Skill not found" });
+      return res.status(404).json({ message: 'Skill not found' });
     }
 
     // Only owner or admin can delete
-    if (
-      skill.owner_id.toString() !== req.user._id.toString() &&
-      req.user.role !== "admin"
-    ) {
-      return res
-        .status(403)
-        .json({ message: "Unauthorized to delete this skill" });
+    if (skill.owner_id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Unauthorized to delete this skill' });
     }
 
     await Skill.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: "Skill deleted successfully" });
+    res.status(200).json({ message: 'Skill deleted successfully' });
   } catch (err) {
-    console.error("Error deleting skill:", err);
-    res.status(500).json({ message: "Error deleting skill" });
+    console.error('Error deleting skill:', err);
+    res.status(500).json({ message: 'Error deleting skill' });
   }
 });
+
 
 module.exports = router;
