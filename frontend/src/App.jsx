@@ -9,6 +9,7 @@ import ServiceDetail from './pages/ServiceDetail';
 import CreateSkill from './pages/CreateSkill';
 import Connections from './pages/Connection';
 import Profile from './pages/Profile';
+import ChatPage from './pages/Chat';
 
 function App() {
   return (
@@ -56,6 +57,15 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ServiceDetail />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/chat/:userId?"
+              element={
+                <ProtectedRoute>
+                  <ChatPage />
                 </ProtectedRoute>
               }
             />
