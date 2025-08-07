@@ -8,6 +8,11 @@ const userSchema = new mongoose.Schema({
   skills: [String],
   profilePicture: String, // Base64 encoded image or URL
   connections: [{ type: mongoose.Schema.Types.ObjectId, ref: "Connection" }],
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
 });
 
 const adminSchema = new mongoose.Schema({
