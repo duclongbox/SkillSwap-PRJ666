@@ -23,20 +23,20 @@ function ChatPage() {
 
         if (chatUserId) {
           const found = accepted.find(conn => {
-            const otherUser = getOtherUser(conn, user._id);
+            const otherUser = getOtherUser(conn, user.id);
             return otherUser._id?.toString() === chatUserId;
           });
 
           if (found) {
-            const otherUser = getOtherUser(found, user._id);
+            const otherUser = getOtherUser(found, user.id);
             setSelectedUser(otherUser);
-            setSelectedConversationId(buildConversationId(user._id, otherUser._id));
+            setSelectedConversationId(buildConversationId(user.id, otherUser._id));
           }
         } else if (!selectedConversationId && accepted.length > 0) {
           const first = accepted[0];
-          const otherUser = getOtherUser(first, user._id);
+          const otherUser = getOtherUser(first, user.id);
           setSelectedUser(otherUser);
-          setSelectedConversationId(buildConversationId(user._id, otherUser._id));
+          setSelectedConversationId(buildConversationId(user.id, otherUser._id));
         }
       } catch (err) {
         console.error("Error fetching connections:", err);
@@ -58,9 +58,9 @@ function ChatPage() {
   }
 
   function handleSelectChat(connection) {
-    const otherUser = getOtherUser(connection, user._id);
+    const otherUser = getOtherUser(connection, user.id);
     setSelectedUser(otherUser);
-    setSelectedConversationId(buildConversationId(user._id, otherUser._id));
+    setSelectedConversationId(buildConversationId(user.id, otherUser._id));
   }
 
   if (!user) {
@@ -78,8 +78,8 @@ function ChatPage() {
           ) : (
             <ul>
               {connections.map(conn => {
-                const otherUser = getOtherUser(conn, user._id);
-                const convoId = buildConversationId(user._id, otherUser._id);
+                const otherUser = getOtherUser(conn, user.id);
+                const convoId = buildConversationId(user.id, otherUser._id);
                 const avatarUrl = otherUser.avatar || otherUser.image || otherUser.photo;
 
                 return (

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
-import MySkillsBox from '../components/userSkillsBox';
+
 
 const Profile = () => {
   const { user } = useAuth();
