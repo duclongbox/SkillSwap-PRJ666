@@ -18,6 +18,8 @@ const {
     listConnections,
     listRequest
 } = require('../../controllers/connectionController')
+const { getAllSkills } = require('../../controllers/skillController');
+const path = require('path');
 
 // Import user routes v1 
 const userRoutes = require('./userRoutes');
@@ -187,6 +189,14 @@ router.delete('/api/skills/:id', isAuthenticated, async (req, res) => {
     res.status(500).json({ message: 'Error deleting skill' });
   }
 });
+
+
+//Skill Route
+router.get('/skills', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../views/skills.html'));
+});
+
+router.get('/api/skills', getAllSkills);
 
 
 module.exports = router;
