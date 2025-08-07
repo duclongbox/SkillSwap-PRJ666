@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
+import MySkillsBox from '../components/userSkillsBox';
 
 const Profile = () => {
   const { user } = useAuth();
@@ -414,13 +415,21 @@ const Profile = () => {
               {isEditing ? (
                 <div>
                   <input
-                    type="text"
-                    name="skills"
-                    value={profileData.skills.join(', ')}
-                    onChange={handleInputChange}
-                    placeholder="Enter skills separated by commas (e.g., JavaScript, React, Node.js)"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 bg-gray-50 focus:bg-white"
-                  />
+                  type="text"
+                  name="skills"
+                    value={profileData.skillsText || profileData.skills.join(', ')}
+                  onChange={(e) => {
+                   const input = e.target.value;
+                      // Update display value for live typing
+                    setProfileData(prev => ({
+                     ...prev,
+                        skillsText: input,
+                        skills: input.split(',').map(skill => skill.trim()).filter(Boolean)
+    }));
+  }}
+  placeholder="Enter skills separated by commas (e.g., JavaScript, React, Node.js)"
+  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 bg-gray-50 focus:bg-white"
+/>
                   <p className="text-sm text-gray-500 mt-2">Separate multiple skills with commas</p>
                 </div>
               ) : (
@@ -530,6 +539,7 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      
     </div>
   );
 };
