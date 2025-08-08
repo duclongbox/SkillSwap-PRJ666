@@ -71,19 +71,24 @@ app.use("/", apiRouter);
 app.get('/', (req, res) => {
     res.json({ message: 'SkillSwap API is running' });
 });
+// Create HTTP server
+const http = require("http"); 
+const serverInstance = http.createServer(app); 
 
 
+// Start server
 const server = async () => {
   try {
-    // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log('Connected to MongoDB');
+    console.log("Connected to MongoDB");
 
-    // Start the server
-    app.listen(PORT, () => {
+    //  Start WebSocket server
+    require("./ws/chatServer")(serverInstance); 
+    
+    serverInstance.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
 
@@ -92,5 +97,5 @@ const server = async () => {
     console.error("Error connecting to MongoDB:", error);
     process.exit(1);
   }
-}
+};
 server();
