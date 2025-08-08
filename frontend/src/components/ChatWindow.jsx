@@ -10,7 +10,7 @@ function ChatWindow({ user, conversationId }) {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    ws.current = new WebSocket("ws://localhost:8000");
+    ws.current = new WebSocket("ws://skillswap-prj666-3ag6.onrender.com");
 
     ws.current.onopen = () => console.log("WebSocket connected");
 
