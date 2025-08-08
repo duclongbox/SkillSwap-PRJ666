@@ -56,6 +56,10 @@ app.get("/", (req, res) => {
 // API Routes
 app.use("/", apiRouter);
 
+const http = require("http"); // Add this line at the top
+const serverInstance = http.createServer(app); // Create HTTP server
+
+
 // Start server
 const server = async () => {
   try {
@@ -65,11 +69,14 @@ const server = async () => {
     });
     console.log("Connected to MongoDB");
 
-    app.listen(PORT, () => {
+    //  Start WebSocket server
+    require("./ws/chatServer")(serverInstance); 
+    
+    serverInstance.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
 
-    require("./ws/chatServer");
+    
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
     process.exit(1);

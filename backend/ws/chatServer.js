@@ -1,73 +1,137 @@
+// const WebSocket = require("ws");
+// const { saveMessage } = require("../controllers/chatController");
+
+// const wss = new WebSocket.Server({ port: 3001 });
+// const clients = new Set();
+
+// wss.on("connection", (ws) => {
+//   console.log("WebSocket connected");
+//   clients.add(ws);
+
+//   ws.on("message", async (rawMessage) => {
+//     try {
+//       let raw = rawMessage;
+
+//       // Handle binary WebSocket frames (Blob-like)
+//       if (raw instanceof Buffer) raw = raw.toString();
+
+//       console.log("RAW MESSAGE:", raw);
+//       const data = JSON.parse(raw);
+//       console.log("PARSED DATA:", data);
+
+//       if (data.type === "chatMessage") {
+//         const { sender, senderName, content, conversationId } = data;
+
+//         if (!sender || !content || !conversationId) {
+//           throw new Error(
+//             "Missing required fields (sender, content, conversationId)"
+//           );
+//         }
+
+//         // Ensure sorted conversation ID (to match DB)
+//         const sortedConversationId = conversationId.split("-").sort().join("-");
+
+//         // Save to DB
+//         await saveMessage({
+//           conversationId: sortedConversationId,
+//           sender,
+//           content,
+//         });
+
+//         // Prepare message for broadcast
+//         const formattedMessage = {
+//           conversationId: sortedConversationId,
+//           sender,
+//           senderName,
+//           content,
+//           createdAt: new Date().toISOString(),
+//         };
+
+//         // Broadcast to all connected clients
+//         for (let client of clients) {
+//           if (client.readyState === WebSocket.OPEN) {
+//             client.send(
+//               JSON.stringify({
+//                 type: "chatMessage",
+//                 message: formattedMessage,
+//               })
+//             );
+//           }
+//         }
+//       }
+//     } catch (err) {
+//       console.error("WS error:", err.message || err);
+//     }
+//   });
+
+//   ws.on("close", () => {
+//     console.log("Client disconnected");
+//     clients.delete(ws);
+//   });
+// });
+
+// console.log("WebSocket server running on ws://localhost:3001");
 const WebSocket = require("ws");
 const { saveMessage } = require("../controllers/chatController");
 
-const wss = new WebSocket.Server({ port: 3001 });
-const clients = new Set();
+module.exports = function (server) {
+  const wss = new WebSocket.Server({ server }); // Attach to existing HTTP server
+  const clients = new Set();
 
-wss.on("connection", (ws) => {
-  console.log("WebSocket connected");
-  clients.add(ws);
+  wss.on("connection", (ws) => {
+    console.log("WebSocket connected");
+    clients.add(ws);
 
-  ws.on("message", async (rawMessage) => {
-    try {
-      let raw = rawMessage;
+    ws.on("message", async (rawMessage) => {
+      try {
+        let raw = rawMessage;
+        if (raw instanceof Buffer) raw = raw.toString();
+        const data = JSON.parse(raw);
 
-      // Handle binary WebSocket frames (Blob-like)
-      if (raw instanceof Buffer) raw = raw.toString();
+        if (data.type === "chatMessage") {
+          const { sender, senderName, content, conversationId } = data;
 
-      console.log("RAW MESSAGE:", raw);
-      const data = JSON.parse(raw);
-      console.log("PARSED DATA:", data);
+          if (!sender || !content || !conversationId) {
+            throw new Error("Missing required fields");
+          }
 
-      if (data.type === "chatMessage") {
-        const { sender, senderName, content, conversationId } = data;
+          const sortedConversationId = conversationId.split("-").sort().join("-");
 
-        if (!sender || !content || !conversationId) {
-          throw new Error(
-            "Missing required fields (sender, content, conversationId)"
-          );
-        }
+          await saveMessage({
+            conversationId: sortedConversationId,
+            sender,
+            content,
+          });
 
-        // Ensure sorted conversation ID (to match DB)
-        const sortedConversationId = conversationId.split("-").sort().join("-");
+          const formattedMessage = {
+            conversationId: sortedConversationId,
+            sender,
+            senderName,
+            content,
+            createdAt: new Date().toISOString(),
+          };
 
-        // Save to DB
-        await saveMessage({
-          conversationId: sortedConversationId,
-          sender,
-          content,
-        });
-
-        // Prepare message for broadcast
-        const formattedMessage = {
-          conversationId: sortedConversationId,
-          sender,
-          senderName,
-          content,
-          createdAt: new Date().toISOString(),
-        };
-
-        // Broadcast to all connected clients
-        for (let client of clients) {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(
-              JSON.stringify({
-                type: "chatMessage",
-                message: formattedMessage,
-              })
-            );
+          for (let client of clients) {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(
+                JSON.stringify({
+                  type: "chatMessage",
+                  message: formattedMessage,
+                })
+              );
+            }
           }
         }
+      } catch (err) {
+        console.error("WS error:", err.message || err);
       }
-    } catch (err) {
-      console.error("WS error:", err.message || err);
-    }
+    });
+
+    ws.on("close", () => {
+      console.log("Client disconnected");
+      clients.delete(ws);
+    });
   });
 
-  ws.on("close", () => {
-    console.log("Client disconnected");
-    clients.delete(ws);
-  });
-});
-
-console.log("WebSocket server running on ws://localhost:3001");
+  console.log("WebSocket server attached to main HTTP server");
+};
