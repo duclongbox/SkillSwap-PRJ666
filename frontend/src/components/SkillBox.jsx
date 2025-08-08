@@ -63,7 +63,7 @@ const SkillBox = () => {
   const handleConnect = async (recipientID, e) => {
     e.preventDefault(); // Prevent card link from triggering
     try {
-      const response = await fetch(`${backendUrl}/${recipientID}/sendRequest`, {
+      const response = await fetch(`${backendUrl}/api/${recipientID}/sendRequest`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -100,30 +100,7 @@ const SkillBox = () => {
       </div>
     );
   }
-<<<<<<< HEAD
-  const handleConnect = async (recipientID) => {
-    try {
-      const response = await fetch(`${backendUrl}/api/${recipientID}/sendRequest`, {
-        method: 'POST',
-        credentials: 'include', // if using cookies/session
-        headers: {
-          'Content-Type': 'application/json',
-          // Add Authorization header if using JWT
-        }
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert(errorData.message || 'Failed to send connection request');
-        return;
-      }
-      alert('Connection request sent!');
-      setSentRequests(prev => [...prev, recipientID]); 
-    } catch (err) {
-      alert('Error sending connection request: ' + err.message);
-    }
-  };
-=======
->>>>>>> fix_bug
+
 
   return (
     <div>
