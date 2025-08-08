@@ -28,6 +28,7 @@ app.use(cors({
   credentials: true,
 }));
 
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -52,6 +53,7 @@ app.use(session({
   },
   name: "sessionID"
 }));
+
 
 // Initialize Passport and restore authentication state from session
 app.use(passport.initialize());
@@ -84,8 +86,10 @@ const server = async () => {
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
+
+    
   } catch (error) {
-    console.error('Error connecting to MongoDB:', error);
+    console.error("Error connecting to MongoDB:", error);
     process.exit(1);
   }
 }

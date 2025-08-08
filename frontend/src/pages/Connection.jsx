@@ -249,18 +249,21 @@ const Connections = () => {
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {connections.map((conn) => (
+                        {connections.map((conn) => {
+                          const connectedUser = conn.sender._id === user.id ? conn.recipient : conn.sender;
+                          console.log(user)
+                          return(
                           <div key={conn._id} className="group bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center space-x-4 mb-4">
                               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                                {(conn.sender?.name || conn.sender?.email || 'U').charAt(0).toUpperCase()}
+                                {(connectedUser?.name || connectedUser?.email || 'U').charAt(0).toUpperCase()}
                               </div>
                               <div className="flex-1">
                                 <h4 className="font-bold text-gray-900 text-lg">
-                                  {conn.sender?.name || conn.sender?.email || 'Unknown User'}
+                                  {connectedUser?.name || connectedUser?.email || 'Unknown User'}
                                 </h4>
                                 <p className="text-gray-500 text-sm">
-                                  {conn.sender?.email && conn.sender?.name ? conn.sender.email : ''}
+                                  {connectedUser?.email && connectedUser?.name ? connectedUser.email : ''}
                                 </p>
                               </div>
                             </div>
@@ -271,14 +274,17 @@ const Connections = () => {
                                 <span className="capitalize">{conn.status || 'Unknown'}</span>
                               </span>
                               
-                              <button className="opacity-0 group-hover:opacity-100 bg-gray-100 hover:bg-gray-200 text-gray-600 p-2 rounded-lg transition-all duration-200">
+                              <Link
+                                to={`/chat/${connectedUser?._id}`} // or receiver._id depending on your logic
+                                className="opacity-0 group-hover:opacity-100 bg-gray-100 hover:bg-gray-200 text-gray-600 p-2 rounded-lg transition-all duration-200"
+                              >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                                 </svg>
-                              </button>
+                              </Link>
                             </div>
                           </div>
-                        ))}
+                        )})}
                       </div>
                     )}
                   </div>
